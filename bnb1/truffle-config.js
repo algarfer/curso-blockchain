@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const provider = new HDWalletProvider({
-  privateKeys: [process.env.WALLET || 'no-wallet'],
+  privateKeys: [process.env.PRIVATE_KEY || 'no-key'],
   providerOrUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545',
 })
 module.exports = {
