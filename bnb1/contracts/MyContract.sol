@@ -20,7 +20,7 @@ contract MyContract {
     function buyTiket(uint tiketIndex) payable public returns (bool) {
         // Comprobación
         require(tiketIndex >= 0 && tiketIndex <= 15);
-        require(msg.value == 0.2 ether, "Insuficient amount of BNB");
+        require(msg.value == 0.02 ether, "Insuficient amount of BNB");
 
         balanceWei += msg.value;
         bool sucess = true;
