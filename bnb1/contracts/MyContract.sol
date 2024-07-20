@@ -23,22 +23,27 @@ contract MyContract {
         admin = newAdmin;
     }
 
-    function buyTiket(uint tiketIndex) payable public returns (bool) {
+    function getBalance() public view returns (uint, uint256) {
+        return (balanceWei, payable(address(this)).balance);
+    }
+
+    function buyTiket(uint tiketIndex) payable public {
         // Comprobación
         require(tiketIndex >= 0 && tiketIndex <= 15);
         require(msg.value == 0.02 ether, "Insuficient amount of BNB");
 
         balanceWei += msg.value;
-        bool sucess = true;
 
-        if (tickets[tiketIndex] == address(0)){
-            // msg.sender address del usuario que invoco al contrato
-            tickets[tiketIndex] = msg.sender;
-            emit simpleConsoleLog("Ticket comprado");
-        } else {
-            sucess = false ;
-        }
-        return sucess;
+        isTicketAvailable(tiketIndex);
+
+        // msg.sender address del usuario que invoco al contrato
+        tickets[tiketIndex] = msg.sender;
+        emit simpleConsoleLog("Ticket comprado");
+    }
+
+    function isTicketAvailable(uint index) public view returns (bool) {
+        require(tickets[index] != address(0), "Este ticket pertenece a otra persona");
+        return true;
     }
 
     function getTikets() public view returns (address[16] memory) {
