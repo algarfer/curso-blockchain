@@ -17,6 +17,12 @@ contract MyContract {
         balanceWei = 0;
     }
 
+    function changeAdmin(address payable newAdmin) public {
+        require(msg.sender == admin, "No eres el admin");
+
+        admin = newAdmin;
+    }
+
     function buyTiket(uint tiketIndex) payable public returns (bool) {
         // Comprobación
         require(tiketIndex >= 0 && tiketIndex <= 15);
