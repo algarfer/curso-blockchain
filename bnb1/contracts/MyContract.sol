@@ -42,7 +42,7 @@ contract MyContract {
     }
 
     function isTicketAvailable(uint index) public view returns (bool) {
-        require(tickets[index] != address(0), "Este ticket pertenece a otra persona");
+        require(tickets[index] == address(0), "Este ticket pertenece a otra persona");
         return true;
     }
 
