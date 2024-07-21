@@ -14,6 +14,7 @@ const App = () => {
   const [walletBalance, setWalletBalance] = useState(0)
   const [weiBalance, setWeiBalance] = useState(0)
   const [userBalance, setUserBalance] = useState(0)
+  const [donation, setDonation] = useState(0.01)
   const error = useRef(false)
 
   const configureBlockchain = async () => {
@@ -61,15 +62,19 @@ const App = () => {
   }
 
   const clickBuyTiket = async (i) => {
+    if(donation < 0.01) {
+      setMsg("You need to donate at least 0.01 BNB to buy a ticket")
+      return
+    }
     const balance = await myProvider.current.getSigner().getBalance()
-    if(balance.lt(ethers.utils.parseEther("0.02"))) {
-      setMsg("You need at least 0.02 BNB to buy a ticket")
+    if(balance.lt(ethers.utils.parseEther(donation))) {
+      setMsg("You need at least 0.01 BNB to buy a ticket")
       return
     }
 
     try {
       const tx = await myContract.current.buyTiket(i,  {
-        value: ethers.utils.parseEther("0.02"),
+        value: ethers.utils.parseEther(donation),
         gasLimit: 6721975,
         gasPrice: 20000000000,
       });
@@ -123,6 +128,7 @@ const App = () => {
     }}>
       <h1>Ticket store</h1>
       <p>{weiToEth(userBalance)} BNB User balance</p>
+      <p>Donacion (min 0.01 BNB): <input type="number" placeholder="0.01" value={donation} onChange={(e) => setDonation(e.target.value)}></input>BNB</p>
       {msg && <p style={{color: "red"}}>{msg}</p>}
       <ul>
         {tickets.map((address, i) => (
