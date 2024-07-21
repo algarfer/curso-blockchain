@@ -49,4 +49,12 @@ contract MyContract {
     function getTikets() public view returns (address[16] memory) {
         return tickets;
     }
+
+    function transferTicket(uint ticketIndex, address newOwner) public {
+        require(ticketIndex >= 0 && ticketIndex <= 15);
+        require(tickets[ticketIndex] == msg.sender, "No eres el dueno del ticket");
+        require(newOwner != address(0), "Direccion no valida");
+
+        tickets[ticketIndex] = newOwner;
+    }
 }

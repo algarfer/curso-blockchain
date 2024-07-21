@@ -16,6 +16,8 @@ const App = () => {
   const [userBalance, setUserBalance] = useState(0)
   const [donation, setDonation] = useState(0.01)
   const error = useRef(false)
+  const walletAddress = useRef("")
+  const [selectedOption, setSelectedOption] = useState(0)
 
   const configureBlockchain = async () => {
     try {
@@ -33,7 +35,8 @@ const App = () => {
           myContractManifest.abi,
           signer
         );
-      
+
+        walletAddress.current = await signer.getAddress()
       }
       //eslint-disable-next-line
     } catch (error) {}
@@ -67,14 +70,14 @@ const App = () => {
       return
     }
     const balance = await myProvider.current.getSigner().getBalance()
-    if(balance.lt(ethers.utils.parseEther(donation))) {
+    if(balance.lt(ethers.utils.parseEther(`${donation}`))) {
       setMsg("You need at least 0.01 BNB to buy a ticket")
       return
     }
 
     try {
       const tx = await myContract.current.buyTiket(i,  {
-        value: ethers.utils.parseEther(donation),
+        value: ethers.utils.parseEther(`${donation}`),
         gasLimit: 6721975,
         gasPrice: 20000000000,
       });
@@ -117,6 +120,29 @@ const App = () => {
     setAdminMsg("Admin changed successfully")
   }
 
+  const transferFormHandler = async (e) => {
+    e.preventDefault()
+    const wallet = e.target[0].value
+    
+    if(!ethers.utils.isAddress(wallet)) {
+      setMsg("The given value is not an address")
+      return
+    }
+
+    if(selectedOption === "" || typeof selectedOption === "number") {
+      setMsg("You need to select a ticket")
+      return
+    }
+
+    if(tickets[selectedOption] !== walletAddress.current) {
+      setMsg("You can only transfer your own tickets")
+      return
+    }
+
+    const tx = await myContract.current.transferTicket(selectedOption, wallet)
+    await tx.wait()
+  }
+
   useEffect(() => {
     initContracts()
     //eslint-disable-next-line
@@ -138,6 +164,23 @@ const App = () => {
           </li>
         ))}
       </ul>
+      <h2>Transferir ticket</h2>
+        { walletAddress.current !== "" ?
+          <form onSubmit={transferFormHandler}>
+            <input type="text" placeholder="Destinatario"></input>
+            {/* TODO - Fix select component interaction  */}
+            <select value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+              { tickets.map((_, i) => (
+                <option key={i} value={i}>Ticket {i}</option>
+              ))
+              .filter((_, i) => tickets[i] === walletAddress.current)
+              }
+            </select>
+            <input type="submit" value="Enviar"></input>
+          </form>
+          :
+          <p>Para transferir un ticket debes tener una wallet conectada</p>
+        }
       <hr />
       <h2>Admin Panel</h2>
       {adminMsg && <p style={{
