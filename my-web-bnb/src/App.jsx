@@ -24,14 +24,13 @@ const App = () => {
       let provider = await detectEthereumProvider()
       if(provider) {
         await provider.request({ method: "eth_requestAccounts" })
-        const networkId = await provider.request({ method: 'net_version' })
   
         provider = new ethers.providers.Web3Provider(provider);
         const signer = provider.getSigner();
         myProvider.current = provider;
   
         myContract.current = new Contract(
-          myContractManifest.networks[networkId].address,
+          import.meta.env.VITE_CONTRACT_WALLET_ADDRESS || "no-address",
           myContractManifest.abi,
           signer
         );
