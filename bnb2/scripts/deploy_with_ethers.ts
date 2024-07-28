@@ -3,16 +3,20 @@
 // And use Right click -> "Run" from context menu of the file to run the script. Shortcut: Ctrl+Shift+S
 
 import { deploy } from './ethers-lib'
+import { ethers } from 'ethers'
 
 (async () => {
   try {
-    const tokenContract = await deploy('Token', [])
-    console.log(`address tokenContract: ${tokenContract.address}`)
-
-    const bankContract = await deploy('Bank', [tokenContract.address])
+    const tokenKey = ""
+    const bankContract = await deploy('Bank', [tokenKey])
     console.log(`address bankContract: ${bankContract.address}`)
 
-    tokenContract.passMinterRole( bankContract.address );
+    const signer = (new ethers.providers.Web3Provider(web3Provider)).getSigner()
+    const abi = ["function passMinterRole(address nuevoMinter) public returns (bool)"]
+
+    const tokenContract = new ethers.Contract(tokenKey, abi, signer)
+    
+    await tokenContract.passMinterRole( bankContract.address );
 
   } catch (e) {
     console.log(e.message)

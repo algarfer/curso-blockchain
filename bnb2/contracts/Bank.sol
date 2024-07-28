@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0
-
 pragma solidity ^0.8.10;
 import "./Token.sol";
 
@@ -27,9 +26,7 @@ contract Bank {
         require(isDeposited[msg.sender] == true, 'Error, no previous deposit');
 
         // interest BMIW
-        uint depositTotalTime = block.timestamp - depositTimeStamp[msg.sender];
-        uint interestPerSecond = (100*clientsBalanceBNB[msg.sender]) / 31668017;
-        uint interest = interestPerSecond * depositTotalTime;
+        uint interest = calculateBMIW();
 
         // return the BNB to original wallet
         payable(msg.sender).transfer(clientsBalanceBNB[msg.sender] - 0.008 ether);
@@ -41,6 +38,20 @@ contract Bank {
         depositTimeStamp[msg.sender] = 0;
         isDeposited[msg.sender] = false;
 
+    }
+
+    function calculateBMIW() view private returns (uint) {
+        uint depositTotalTime = block.timestamp - depositTimeStamp[msg.sender];
+        uint interestPerSecond = (100*clientsBalanceBNB[msg.sender]) / 31668017;
+        return interestPerSecond * depositTotalTime;
+    }
+
+    function getBNB() view public returns (uint) {
+        return clientsBalanceBNB[msg.sender] == 0 ? 0 : clientsBalanceBNB[msg.sender] - 0.008 ether;
+    }
+
+    function getBMIW() view public returns (uint) {
+        return calculateBMIW();
     }
 
 }

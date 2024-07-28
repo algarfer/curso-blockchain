@@ -1,12 +1,12 @@
 import detectEthereumProvider from "@metamask/detect-provider"
 import { BigNumber, Contract, ethers } from "ethers"
-import myContractManifest from "./contracts/MyContract.json"
+import bankManifest from "./contracts/Bank.json"
 import { useEffect, useState, useRef } from "react"
 
 const weiToEth = (wei) => ethers.utils.formatEther(BigNumber.from(wei))
 
 const App = () => {
-  const myContract = useRef(null)
+  const bank = useRef(null)
   const myProvider = useRef(null)
   const [userBalance, setUserBalance] = useState(0)
   const walletAddress = useRef("")
@@ -21,9 +21,9 @@ const App = () => {
         const signer = provider.getSigner();
         myProvider.current = provider;
   
-        myContract.current = new Contract(
-          import.meta.env.VITE_CONTRACT_WALLET_ADDRESS || "no-address",
-          myContractManifest.abi,
+        bank.current = new Contract(
+          import.meta.env.VITE_BANK_ADDRESS || "no-address",
+          bankManifest.abi,
           signer
         );
 
@@ -43,13 +43,47 @@ const App = () => {
     setUserBalance(balance.toString())
   }
 
+  const formHandler = async (e) => {
+    e.preventDefault();
+
+    const BNBamount = parseFloat(e.target.elements[0].value);
+  
+      // Wei to BNB se pasa con ethers.utils recibe un String!!!
+      const tx = await bank.current.deposit({
+          value: ethers.utils.parseEther(String(BNBamount)),
+          gasLimit: 6721975,
+          gasPrice: 20000000000,
+      });
+      await tx.wait();
+      
+      e.target.elements[0].value = "";
+  }
+
+  const clickWithdraw = async () => {
+    await bank.current.withdraw();
+  }
+
+
   useEffect(() => {
     initContracts()
     //eslint-disable-next-line
   }, [])
 
   return (
-    <h1>BNB Bank</h1>
+    <div>
+      <h1>BNB Bank</h1>
+      <p>User balance: {weiToEth(userBalance)} BNB</p>
+      <form onSubmit={formHandler} style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: "1rem"
+      }}>
+        <input type="number" step="0.01" />
+        <input type="submit" value="Deposit" />
+      </form>
+
+      <button onClick= { clickWithdraw } > Withdraw </button>
+    </div>
   )
 }
 
