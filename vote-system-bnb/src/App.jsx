@@ -18,7 +18,7 @@ const App = () => {
         const signer = provider.getSigner();
   
         voteSystem.current = new Contract(
-          import.meta.env.VITE_VOTE_ADDRESS || "no-address",
+          import.meta.env.VITE_VOTE_SYSTEM_ADDRESS || "no-address",
           voteSystemManifest.abi,
           signer
         );

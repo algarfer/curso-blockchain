@@ -39,5 +39,15 @@ contract TokenVote is ERC20 {
         admin = _admin;
     }
 
+    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+        require(msg.sender == minter, "Only the minterRole can transfer ");
+        return super.transfer(recipient, amount);
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
+        require(sender == minter, "Only the minterRole can transfer tokens ");
+        return super.transferFrom(sender, recipient, amount);
+    }
+
 }
 
