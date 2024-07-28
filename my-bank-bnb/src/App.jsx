@@ -11,7 +11,6 @@ const App = () => {
   const [userBalance, setUserBalance] = useState(0)
   const [depositedBalance, setDepositedBalance] = useState(0)
   const [interestBalance, setInterestBalance] = useState(0)
-  const walletAddress = useRef("")
 
   const configureBlockchain = async () => {
     try {
@@ -28,8 +27,6 @@ const App = () => {
           bankManifest.abi,
           signer
         );
-
-        walletAddress.current = await signer.getAddress()
       }
       //eslint-disable-next-line
     } catch (error) {}
