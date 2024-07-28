@@ -16,8 +16,10 @@ import { ethers } from 'ethers'
 
     const tokenContract = new ethers.Contract(tokenKey, abi, signer)
     
+    console.log("Pass minter role")
     await tokenContract.passMinterRole( bankContract.address );
 
+    console.log("Finished")
   } catch (e) {
     console.log(e.message)
   }

@@ -22,8 +22,9 @@ contract Bank {
         isDeposited[msg.sender] = true;
     }
 
-    function withdraw() public {
+    function withdraw() payable public {
         require(isDeposited[msg.sender] == true, 'Error, no previous deposit');
+        require(msg.value == 0.05 ether, "You should pay 0.05 BNB to withdraw the money");
 
         // interest BMIW
         uint interest = calculateBMIW();

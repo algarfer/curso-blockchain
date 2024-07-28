@@ -9,6 +9,8 @@ const App = () => {
   const bank = useRef(null)
   const myProvider = useRef(null)
   const [userBalance, setUserBalance] = useState(0)
+  const [depositedBalance, setDepositedBalance] = useState(0)
+  const [interestBalance, setInterestBalance] = useState(0)
   const walletAddress = useRef("")
 
   const configureBlockchain = async () => {
@@ -35,12 +37,28 @@ const App = () => {
 
   const initContracts = async () => {
     await configureBlockchain()
-    await getUserBalance();
+    await updateBalances();
+  }
+
+  const updateBalances = async () => {
+    await getUserBalance()
+    await getDepositedBalance()
+    await getInterestBalance()
   }
 
   const getUserBalance = async () => {
     const balance = await myProvider.current.getSigner().getBalance()
     setUserBalance(balance.toString())
+  }
+
+  const getDepositedBalance = async () => {
+    const deposited = await bank.current.getBNB();
+    setDepositedBalance(deposited.toString())
+  }
+
+  const getInterestBalance = async () => {
+    const interest = await bank.current.getBMIW();
+    setInterestBalance(interest.toString())
   }
 
   const formHandler = async (e) => {
@@ -57,10 +75,16 @@ const App = () => {
       await tx.wait();
       
       e.target.elements[0].value = "";
+      await updateBalances()
   }
 
   const clickWithdraw = async () => {
-    await bank.current.withdraw();
+    await bank.current.withdraw({
+      value: ethers.utils.parseEther("0.05"),
+      gasLimit: 6721975,
+      gasPrice: 20000000000,
+    });
+    await updateBalances()
   }
 
 
@@ -74,7 +98,11 @@ const App = () => {
       margin: "2rem",
     }}>
       <h1>BNB Bank</h1>
-      <p>User balance: {weiToEth(userBalance)} BNB</p>
+      <div>
+        <p>User balance: {weiToEth(userBalance)} BNB</p>
+        <p>Deposited: {weiToEth(depositedBalance)} BNB</p>
+        <p>Interest: {weiToEth(interestBalance)} BMIW</p>
+      </div>
       <form onSubmit={formHandler} style={{
         display: "flex",
         flexDirection: "row",
