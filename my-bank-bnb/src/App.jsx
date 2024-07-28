@@ -70,7 +70,9 @@ const App = () => {
   }, [])
 
   return (
-    <div>
+    <div style={{
+      margin: "2rem",
+    }}>
       <h1>BNB Bank</h1>
       <p>User balance: {weiToEth(userBalance)} BNB</p>
       <form onSubmit={formHandler} style={{
