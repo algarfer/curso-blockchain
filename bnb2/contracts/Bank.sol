@@ -7,6 +7,7 @@ contract Bank {
     Token private token;
     // hash address - uint
     mapping(address => uint) public clientsBalanceBNB;
+    mapping(address => uint) public accumulatedBMIW;
     mapping(address => uint) public depositTimeStamp;
     mapping(address => bool) public isDeposited;
     
@@ -17,6 +18,7 @@ contract Bank {
     }
 
     function deposit() payable public {
+        accumulatedBMIW[msg.sender] += calculateBMIW();
         clientsBalanceBNB[msg.sender] = clientsBalanceBNB[msg.sender] + msg.value;
         depositTimeStamp[msg.sender] = block.timestamp;
         isDeposited[msg.sender] = true;
@@ -27,7 +29,7 @@ contract Bank {
         require(msg.value == 0.05 ether, "You should pay 0.05 BNB to withdraw the money");
 
         // interest BMIW
-        uint interest = calculateBMIW();
+        uint interest = calculateBMIW() + accumulatedBMIW[msg.sender];
 
         // return the BNB to original wallet
         payable(msg.sender).transfer(clientsBalanceBNB[msg.sender] - 0.008 ether);
@@ -36,6 +38,7 @@ contract Bank {
         // Crear el token y lo envia a la addres del msg.sender
         token.mint(msg.sender, interest);
         // reiniciar reposito
+        accumulatedBMIW[msg.sender] = 0;
         depositTimeStamp[msg.sender] = 0;
         isDeposited[msg.sender] = false;
 
@@ -52,7 +55,7 @@ contract Bank {
     }
 
     function getBMIW() view public returns (uint) {
-        return calculateBMIW();
+        return calculateBMIW() + accumulatedBMIW[msg.sender];
     }
 
 }
