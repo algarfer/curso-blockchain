@@ -10,6 +10,8 @@ contract Bank {
     mapping(address => uint) public accumulatedBMIW;
     mapping(address => uint) public depositTimeStamp;
     mapping(address => bool) public isDeposited;
+
+    uint public profitBMIW;
     
     //pass as constructor argument deployed Token contract
     constructor(Token _token) {
@@ -56,6 +58,17 @@ contract Bank {
 
     function getBMIW() view public returns (uint) {
         return calculateBMIW() + accumulatedBMIW[msg.sender];
+    }
+
+    function buyBMIW(uint qty) payable public {
+        require(msg.value == costBMIW(qty), "You need 0.001 BNB per 1 BMIW");
+        profitBMIW += msg.value;
+
+        token.mint(msg.sender, qty * (10 ** 18));
+    }
+
+    function costBMIW(uint qty) pure public returns (uint) {
+        return qty * 0.001 ether;
     }
 
 }
