@@ -7,6 +7,7 @@ const App = () => {
   const stockManager = useRef(null)
   const myProvider = useRef(null)
   const [actions, setActions] = useState(0)
+  const [msg, setMsg] = useState("")
 
   const configureBlockchain = async () => {
     try {
@@ -50,6 +51,7 @@ const App = () => {
       })  
       await tx.wait()
 
+      setMsg("Transacción exitosa")
       await getActions()
     } catch (error) {
       console.error(error)
@@ -61,6 +63,12 @@ const App = () => {
     //eslint-disable-next-line
   }, [])
 
+  useEffect(() => {
+    setTimeout(() => {
+      setMsg("")
+    }, 5000);
+  }, [msg])
+
   return (
     <div style={{
       margin: "2rem",
@@ -68,7 +76,14 @@ const App = () => {
       <h1>BNB Stocks Manager</h1>
       <hr />
       <p>Actualmente posees {actions} {actions === 1 ? "accion" : "acciones"}</p>
-      <button onClick={buttonHandler}>Comprar una accion</button>
+      <div style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: "1rem"
+      }}>
+        <button onClick={buttonHandler}>Comprar una accion</button>
+        {msg && <p style={{ margin: 0 }}>{msg}</p>}
+      </div>
     </div>
   )
 }
