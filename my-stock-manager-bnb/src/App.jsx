@@ -65,7 +65,7 @@ const App = () => {
     }}>
       <h1>BNB Stocks Manager</h1>
       <hr />
-      <p>Actualmente posees {actions} acciones</p>
+      <p>Actualmente posees {actions} {actions === 1 ? "accion" : "acciones"}</p>
       <button onClick={buttonHandler}>Comprar una accion</button>
     </div>
   )
