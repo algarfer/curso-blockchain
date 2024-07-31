@@ -45,9 +45,11 @@ const App = () => {
 
   const buttonHandler = async () => {
     try {
-      await stockManager.current.buyAction({
+      const tx = await stockManager.current.buyAction({
         value: ethers.utils.parseEther("0.01")
-      })
+      })  
+      await tx.wait()
+
       await getActions()
     } catch (error) {
       console.error(error)
